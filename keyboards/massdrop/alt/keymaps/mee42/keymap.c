@@ -15,6 +15,10 @@ enum alt_keycodes {
 
 keymap_config_t keymap_config;
 
+#define MED_LEF KC_MEDIA_PREV_TRACK
+#define MED_RIG KC_MEDIA_NEXT_TRACK
+#define SRT_STP KC_MEDIA_PLAY_PAUSE
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // layer 0 is the base
     [0] = LAYOUT(
@@ -23,14 +27,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    LSFT(KC_GRV), KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGUP, \
         KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,          KC_UP,   KC_PGDN, \
         KC_LCTL, KC_LGUI, KC_LALT,                            KC_SPC,                             KC_RALT, MO(1),   KC_LEFT, KC_DOWN, KC_RGHT  \
-    ),// layout 1 if for the while-fn-held layer
+    ),
+    // layout 1 if for the while-fn-held layer
     [1] = LAYOUT( 
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
         KC_CAPS, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
         _______, _______, _______, _______, _______, MD_BOOT, TG_NKRO, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, _______,                            _______,                            _______, _______, KC_HOME, _______, KC_END   \
-    ), // layout 2 is for LED configuring
+        _______, _______, _______,                            _______,                            _______, _______, MED_LEF, SRT_STP, MED_RIG   \
+    ), 
     /*
     [X] = LAYOUT(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
