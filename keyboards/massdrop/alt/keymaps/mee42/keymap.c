@@ -1,4 +1,5 @@
 #include QMK_KEYBOARD_H
+#define RGBLIGHT_DEFAULT_MODE RGB_MODE_BREATHE
 
 enum alt_keycodes {
     U_T_AUTO = SAFE_RANGE, //USB Extra Port Toggle Auto Detect / Always Active
@@ -27,16 +28,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
         KC_CAPS, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, _______, _______, _______, MD_BOOT, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, _______,                            _______,                            TG(2),   _______, KC_HOME, _______, KC_END   \
+        _______, _______, _______, _______, _______, MD_BOOT, TG_NKRO, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______,                            _______,                            _______, _______, KC_HOME, _______, KC_END   \
     ), // layout 2 is for LED configuring
-   [2] = LAYOUT(
-        TG(2),   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
-        _______, RGB_SPD, RGB_VAI, RGB_SPI, RGB_HUI, RGB_SAI, _______, _______, _______, _______, _______, _______, _______, _______, _______,  \
-        _______, RGB_RMOD,RGB_VAD, RGB_MOD, RGB_HUD, RGB_SAD, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, RGB_TOG, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, _______,                            _______,                            TG(2)  , TG(2),   _______, _______, _______   \
-    )
     /*
     [X] = LAYOUT(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
@@ -48,12 +42,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     */
 };
 
+
 // Runs just one time when the keyboard initializes.
 void matrix_init_user(void) {
+    rgb_matrix_set_speed_noeeprom(75);
+    for(int i = 0; i < 3; i++) {
+        rgb_matrix_decrease_sat_noeeprom();
+    }
 };
+static uint32_t sleep_timer;
+static bool in_sleep;
 
 // Runs constantly in the background, in a loop.
 void matrix_scan_user(void) {
+    if (!in_sleep && timer_elapsed32(sleep_timer) >= 1000/*ms/s*/ * 60/*s/min*/ * 5/*min*/) {
+        in_sleep = true;
+        rgb_matrix_set_color_all(0, 0, 0);
+        rgb_matrix_set_flags(LED_FLAG_NONE);
+    }
 };
 
 #define MODS_SHIFT  (get_mods() & MOD_BIT(KC_LSHIFT) || get_mods() & MOD_BIT(KC_RSHIFT))
@@ -62,6 +68,13 @@ void matrix_scan_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t key_timer;
+
+    sleep_timer = timer_read32(); // stores the time of last keystroke
+    if(in_sleep) {
+        in_sleep = false;
+        rgb_matrix_enable_noeeprom();
+        rgb_matrix_set_flags(LED_FLAG_ALL);
+    }
 
     switch (keycode) {
         case U_T_AUTO:
@@ -105,35 +118,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
         case RGB_TOG:
             if (record->event.pressed) {
-              switch (rgb_matrix_get_flags()) {
-                case LED_FLAG_ALL: {
-                    rgb_matrix_set_flags(LED_FLAG_KEYLIGHT);
-                    rgb_matrix_set_color_all(0, 0, 0);
-                  }
-                  break;
-                case LED_FLAG_KEYLIGHT: {
-                    rgb_matrix_set_flags(LED_FLAG_UNDERGLOW);
-                    rgb_matrix_set_color_all(0, 0, 0);
-                  }
-                  break;
-                case LED_FLAG_UNDERGLOW: {
-                    rgb_matrix_set_flags(LED_FLAG_NONE);
-                    rgb_matrix_disable_noeeprom();
-                  }
-                  break;
-                default: {
-                    rgb_matrix_set_flags(LED_FLAG_ALL);
-                    rgb_matrix_enable_noeeprom();
-                  }
-                  break;
-              }
+                in_sleep = true;
+                rgb_matrix_set_color_all(0, 0, 0);
+                //rgb_matrix_set_flags(LED_FLAG_ALL);
             }
             return false;
         
         default:
-            if(layer_state_is(2)){
-                rgb_matrix_set_flags(LED_FLAG_KEYLIGHT);
-            }
             return true; //Process all other keycodes normally
     }
 }
