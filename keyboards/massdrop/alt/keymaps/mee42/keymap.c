@@ -1,5 +1,5 @@
 #include QMK_KEYBOARD_H
-#define RGBLIGHT_DEFAULT_MODE RGB_MODE_BREATHE
+
 
 enum alt_keycodes {
     U_T_AUTO = SAFE_RANGE, //USB Extra Port Toggle Auto Detect / Always Active
