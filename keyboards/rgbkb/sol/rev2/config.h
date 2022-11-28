@@ -18,13 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-/* USB Device descriptor parameter */
-#define VENDOR_ID       0xFEED
-#define PRODUCT_ID      0x3060
-#define DEVICE_VER      0x0002
-#define MANUFACTURER    RGBKB
-#define PRODUCT         Sol
-
 /* ws2812 RGB LED */
 #define RGB_DI_PIN B7
 
@@ -55,7 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   #endif
 #endif
 
-#define DRIVER_LED_TOTAL  RGBLED_NUM
+#define RGB_MATRIX_LED_COUNT  RGBLED_NUM
 
 #define RGB_MATRIX_CENTER { 112, 37 }
 
@@ -64,7 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ENCODERS_PAD_A { D2 }
 #define ENCODERS_PAD_B { D6 }
 #else
-#ifdef OLED_DRIVER_ENABLE
+#ifdef OLED_ENABLE
     #error Extra encoders cannot be enabled at the same time as the OLED Driver as they use the same pins.
 #endif
 #define ENCODERS_PAD_A { D2, D1, B0 }
